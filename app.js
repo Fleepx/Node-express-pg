@@ -41,6 +41,39 @@ app.post('/posts', async (req, res) => {
     }
 });
 
+app.delete('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM posts WHERE id = $1 RETURNING *', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).send('Post no encontrado');
+        }
+        res.json({ message: 'Post eliminado', post: result.rows[0] });
+    } catch (error) {
+        console.error('Error eliminando el post:', error);
+        res.status(500).send('Error en el servidor');
+    }
+});
+
+app.put('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    const { titulo, img, descripcion, likes } = req.body;
+    try {
+        const result = await pool.query(
+            'UPDATE posts SET titulo = $1, img = $2, descripcion = $3, likes = $4 WHERE id = $5 RETURNING *',
+            [titulo, img, descripcion, likes, id]
+        );
+        if (result.rowCount === 0) {
+            return res.status(404).send('Post no encontrado');
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error actualizando el post:', error);
+        res.status(500).send('Error en el servidor');
+    }
+});
+
+
 app.get('/', (req, res) => {
     res.send('Servidor corriendo...');
 });
