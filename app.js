@@ -60,7 +60,7 @@ app.put('/posts/:id', async (req, res) => {
     const { titulo, img, descripcion, likes } = req.body;
     try {
         const result = await pool.query(
-            'UPDATE posts SET titulo = $1, img = $2, descripcion = $3, likes = $4 WHERE id = $5 RETURNING *',
+            'UPDATE posts SET likes = $4 WHERE id = $5 RETURNING *',
             [titulo, img, descripcion, likes, id]
         );
         if (result.rowCount === 0) {
